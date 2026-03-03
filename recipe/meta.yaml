@@ -1,0 +1,57 @@
+{% set name = "opentelemetry-exporter-prometheus" %}
+{% set version = "0.59b0" %}
+
+package:
+  name: {{ name }}
+  version: {{ version }}
+
+source:
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name.replace('-', '_') }}-{{ version }}.tar.gz
+  sha256: d64f23c49abb5a54e271c2fbc8feacea0c394a30ec29876ab5ef7379f08cf3d7
+
+build:
+  number: 0
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  skip: True  # [py<39]
+
+requirements:
+  host:
+    - python
+    - pip
+    - hatchling
+  run:
+    - python
+    - opentelemetry-api >=1.12,<2
+    - opentelemetry-sdk >=1.38.0,<1.39
+    - prometheus_client >=0.5.0,<1.0.0
+
+test:
+  imports:
+    - opentelemetry
+    - opentelemetry.exporter
+    - opentelemetry.exporter.prometheus
+  requires:
+    - pip
+  commands:
+    - pip check
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
+    # Cannot run tests: E   ModuleNotFoundError: No module named 'opentelemetry.test'
+    # - pytest -v tests
+
+about:
+  home: https://github.com/open-telemetry/opentelemetry-python/tree/main/exporter/opentelemetry-exporter-prometheus
+  summary: The OpenTelemetry Prometheus Exporter allows export of OpenTelemetry metrics to Prometheus.
+  description: The OpenTelemetry Prometheus Exporter allows export of OpenTelemetry metrics to Prometheus.
+  license: Apache-2.0
+  license_family: Apache
+  license_file: LICENSE
+  dev_url: https://github.com/open-telemetry/opentelemetry-python/tree/main/exporter/opentelemetry-exporter-prometheus
+  doc_url: https://opentelemetry-python.readthedocs.io/en/latest/exporter/prometheus/prometheus.html
+
+extra:
+  recipe-maintainers:
+    - thewchan
+    - rxm7706
+    - conda-forge/opentelemetry-api
+    - conda-forge/opentelemetry-sdk
+    - zbowling
